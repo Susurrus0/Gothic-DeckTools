@@ -53,20 +53,20 @@ flatpak install -y com.github.Matoking.protontricks
 while ! flatpak list | grep -q "com.github.Matoking.protontricks"; do
     sleep 2
 done
-# Fix Gothic 2 music bug
+# Fix Gothic 2 background music bug
 flatpak run com.github.Matoking.protontricks 39510 directmusic
-USER_REG_PATH="~/.local/share/Steam/steamapps/compatdata/39510/pfx/user.reg"
+USER_REG_PATH="$PREFIX_PATH/user.reg"
 if [[ -f "$USER_REG_PATH" ]]; then
-    sed -i "s/"\*dsound"="native"/"ddraw"="native,builtin"/" "$USER_REG_PATH"
+    sed -i 's/"\*dsound"="native"/"ddraw"="native,builtin"/' "$USER_REG_PATH"
 else
     echo "ERROR: user.reg file not found at $USER_REG_PATH."
 fi
 # Adjust interface scale
 echo "Adjusting interface scale..."
 if [[ -f "$SYSTEM_PACK_PATH" ]]; then
-    sed -i "/^Scale=/c\Scale=1.4/" "$SYSTEM_PACK_PATH"
+    sed -i '/^Scale=/c\Scale=1.4' "$SYSTEM_PACK_PATH"
 else
-    echo "ERROR: SystemPack.ini file not found at $GOTHIC2_PATH/system."
+    echo "ERROR: SystemPack.ini file not found at $SYSTEM_PACK_PATH."
 fi
 # Fix L'Hiver interface scale
 echo -e "\nAdjusting L'Hiver interface scale..."
@@ -75,9 +75,9 @@ if [[ -d "$LHIVER_DIR" ]]; then
     for FILE in Lhiver_masty_de.ini Lhiver_masty_en.ini Lhiver_masty_pl.ini; do
         LHIVER_INI_PATH="$LHIVER_DIR/system/$FILE"
         if [[ -f "$LHIVER_INI_PATH" ]]; then
-            sed -i "/INTERFACE.Scale=0/d" "$LHIVER_INI_PATH"
+            sed -i '/INTERFACE.Scale=0/d' "$LHIVER_INI_PATH"
         else
-            echo "ERROR: File $FILE not found in $LHIVER_DIR/system/."
+            echo "ERROR: File $FILE not found at $LHIVER_INI_PATH."
         fi
     done
 else
@@ -88,8 +88,8 @@ echo -e "\nAdjusting XP Bar..."
 XP_BAR_DIR="$WORKSHOP_DIR$XP_BAR_ID/"
 if [[ -d "$XP_BAR_DIR" ]]; then
     if check_gothic_ini; then
-        sed -i "/^needTextInCenter=/c\needTextInCenter=0" "$GOTHIC_INI_PATH"
-        sed -i "/^possibleFontsMultiplierIdx=/c\possibleFontsMultiplierIdx=5" "$GOTHIC_INI_PATH"
+        sed -i '/^needTextInCenter=/c\needTextInCenter=0' "$GOTHIC_INI_PATH"
+        sed -i '/^possibleFontsMultiplierIdx=/c\possibleFontsMultiplierIdx=5' "$GOTHIC_INI_PATH"
     else
         echo "ERROR: Gothic.ini file not found at $GOTHIC2_PATH/system."
     fi
@@ -101,10 +101,10 @@ echo -e "\nAdjusting Union Advanced Inventory..."
 ADV_INVENTORY_PATH="$WORKSHOP_DIR$ADV_INVENTORY_ID/"
 if [[ -d "$ADV_INVENTORY_PATH" ]]; then
         if check_gothic_ini; then
-            sed -i "/^invAdvCntRows=/c\invAdvCntRows=4" "$GOTHIC_INI_PATH"
-            sed -i "/^invAdvCntCol=/c\invAdvCntCol=6" "$GOTHIC_INI_PATH"
-            sed -i "/^invSizeCell=/c\invSizeCell=600" "$GOTHIC_INI_PATH"
-            sed -i "/^customTransparencyItemsIdx=/c\customTransparencyItemsIdx=4" "$GOTHIC_INI_PATH"
+            sed -i '/^invAdvCntRows=/c\invAdvCntRows=4' "$GOTHIC_INI_PATH"
+            sed -i '/^invAdvCntCol=/c\invAdvCntCol=6' "$GOTHIC_INI_PATH"
+            sed -i '/^invSizeCell=/c\invSizeCell=600' "$GOTHIC_INI_PATH"
+            sed -i '/^customTransparencyItemsIdx=/c\customTransparencyItemsIdx=4' "$GOTHIC_INI_PATH"
         else
             echo "ERROR: Gothic.ini file not found at $GOTHIC2_PATH/system."
         fi
