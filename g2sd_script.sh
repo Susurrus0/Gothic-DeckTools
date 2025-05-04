@@ -55,11 +55,16 @@ while ! flatpak list | grep -q "com.github.Matoking.protontricks"; do
 done
 # Fix Gothic 2 background music bug
 flatpak run com.github.Matoking.protontricks 39510 directmusic
-USER_REG_PATH="$PREFIX_PATH/user.reg"
+USER_REG_PATH="${PREFIX_PATH}user.reg"
 if [[ -f "$USER_REG_PATH" ]]; then
     sed -i 's/"\*dsound"="native"/"ddraw"="native,builtin"/' "$USER_REG_PATH"
 else
     echo "ERROR: user.reg file not found at $USER_REG_PATH."
+fi
+if grep -q '"ddraw"="native,builtin"' $USER_REG_PATH; then
+    echo "user.reg modified successfully.\n"
+else
+    echo "ERROR: Failed to modify user.reg."
 fi
 # Adjust interface scale
 echo "Adjusting interface scale..."
@@ -73,7 +78,7 @@ echo -e "\nAdjusting L'Hiver interface scale..."
 LHIVER_DIR="$WORKSHOP_DIR$LHIVER_ID/"
 if [[ -d "$LHIVER_DIR" ]]; then
     for FILE in Lhiver_masty_de.ini Lhiver_masty_en.ini Lhiver_masty_pl.ini; do
-        LHIVER_INI_PATH="$LHIVER_DIR/system/$FILE"
+        LHIVER_INI_PATH="${LHIVER_DIR}system/$FILE"
         if [[ -f "$LHIVER_INI_PATH" ]]; then
             sed -i '/INTERFACE.Scale=0/d' "$LHIVER_INI_PATH"
         else
