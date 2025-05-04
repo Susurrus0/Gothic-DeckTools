@@ -2,7 +2,7 @@
 APP_ID=39510
 GOTHIC2_PATH="$HOME/.local/share/Steam/steamapps/common/Gothic II/"
 GOTHIC_INI_PATH="$HOME/.local/share/Steam/steamapps/common/Gothic II/system/Gothic.ini"
-SYSTEM_PACK_PATH="$HOME/.local/share/Steam/steamapps/common/Gothic II/system/SystemPack.ini"
+SYSTEMPACK_INI_PATH="$HOME/.local/share/Steam/steamapps/common/Gothic II/system/SystemPack.ini"
 PREFIX_PATH="$HOME/.local/share/Steam/steamapps/compatdata/39510/pfx/"
 WORKSHOP_DIR="$HOME/.local/share/Steam/steamapps/workshop/content/39510/"
 LHIVER_ID=2973766210
@@ -61,17 +61,22 @@ if [[ -f "$USER_REG_PATH" ]]; then
 else
     echo "ERROR: user.reg file not found at $USER_REG_PATH."
 fi
-if grep -q '"ddraw"="native,builtin"' $USER_REG_PATH; then
+if grep -q '"ddraw"="native,builtin"' "$USER_REG_PATH"; then
     echo "user.reg modified successfully.\n"
 else
     echo "ERROR: Failed to modify user.reg."
 fi
-# Adjust interface scale
+Adjust interface scale
 echo "Adjusting interface scale..."
-if [[ -f "$SYSTEM_PACK_PATH" ]]; then
-    sed -i '/^Scale=/c\Scale=1.4' "$SYSTEM_PACK_PATH"
+if [[ -f "$SYSTEMPACK_INI_PATH" ]]; then
+    sed -i '/^Scale=/c\Scale=1.4' "$SYSTEMPACK_INI_PATH"
 else
-    echo "ERROR: SystemPack.ini file not found at $SYSTEM_PACK_PATH."
+    echo "ERROR: SystemPack.ini file not found at $SYSTEMPACK_INI_PATH."
+fi
+if grep -q 'Scale=1.4' "$SYSTEMPACK_INI_PATH"; then
+    echo "SystemPack.ini - Scale modified successfully."
+else
+    echo "ERROR: Failed to modify SystemPack.ini."
 fi
 # Fix L'Hiver interface scale
 echo -e "\nAdjusting L'Hiver interface scale..."
@@ -83,6 +88,11 @@ if [[ -d "$LHIVER_DIR" ]]; then
             sed -i '/INTERFACE.Scale=0/d' "$LHIVER_INI_PATH"
         else
             echo "ERROR: File $FILE not found at $LHIVER_INI_PATH."
+        fi
+        if ! grep -q 'INTERFACE.Scale=0' "$LHIVER_INI_PATH"; then
+            echo "$FILE - Scale modified successfully."
+        else
+            echo "ERROR: Failed to modify $FILE."
         fi
     done
 else
@@ -98,6 +108,11 @@ if [[ -d "$XP_BAR_DIR" ]]; then
     else
         echo "ERROR: Gothic.ini file not found at $GOTHIC2_PATH/system."
     fi
+    if grep -q 'needTextInCenter=0' "$GOTHIC_INI_PATH" && grep -q 'possibleFontsMultiplierIdx=5' "$GOTHIC_INI_PATH"; then
+        echo "Gothic.ini - XP Bar modified successfully."
+    else
+        echo "ERROR: Failed to modify Gothic.ini."
+    fi
 else
     echo "XP Bar not installed. Skipping."
 fi
@@ -112,6 +127,14 @@ if [[ -d "$ADV_INVENTORY_PATH" ]]; then
             sed -i '/^customTransparencyItemsIdx=/c\customTransparencyItemsIdx=4' "$GOTHIC_INI_PATH"
         else
             echo "ERROR: Gothic.ini file not found at $GOTHIC2_PATH/system."
+        fi
+        if grep -q "invAdvCntRows=4" "$GOTHIC_INI_PATH" && \
+           grep -q "invAdvCntCol=6" "$GOTHIC_INI_PATH" && \
+           grep -q "invSizeCell=600" "$GOTHIC_INI_PATH" && \
+           grep -q "customTransparencyItemsIdx=4" "$GOTHIC_INI_PATH"; then
+            echo "Gothic.ini - Union Advanced Inventory modified successfully."
+        else
+            echo "ERROR: Failed to modify Gothic.ini."
         fi
 else
     echo "Union Advanced Inventory not installed. Skipping."
