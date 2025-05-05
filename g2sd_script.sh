@@ -1,4 +1,5 @@
-#! /usr/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 APP_ID=39510
 GOTHIC2_PATH="$HOME/.local/share/Steam/steamapps/common/Gothic II/"
 GOTHIC_INI_PATH="$HOME/.local/share/Steam/steamapps/common/Gothic II/system/Gothic.ini"
@@ -66,7 +67,7 @@ if grep -q '"ddraw"="native,builtin"' "$USER_REG_PATH"; then
 else
     echo "ERROR: Failed to modify user.reg."
 fi
-Adjust interface scale
+# Adjust interface scale
 echo "Adjusting interface scale..."
 if [[ -f "$SYSTEMPACK_INI_PATH" ]]; then
     sed -i '/^Scale=/c\Scale=1.4' "$SYSTEMPACK_INI_PATH"
@@ -141,3 +142,5 @@ else
 fi
 # Finished
 echo -e "\nAll done. Gothic 2 is now set up and configured for the Steam Deck."
+echo "Exiting in 3 seconds..."
+sleep 3

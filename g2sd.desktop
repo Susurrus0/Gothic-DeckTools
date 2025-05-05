@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Gothic 2 Steam Deck config
+Comment=Launch the Gothic 2 Steam Deck configuration script
+Exec=$HOME/.susurrus0/g2sd_script.sh
+Icon=steam_icon_22380
+Terminal=true
+Type=Application
+StartupNotify=false
