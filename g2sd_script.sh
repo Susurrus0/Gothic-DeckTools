@@ -1,6 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 APP_ID=39510
+# Function to find where Steam is installed
+find_steam() {
+    # Flatpak
+    if [[ -d "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/" ]]; then
+        echo "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/"
+        return
+    fi
+    # Native package
+    if [[ -d "$HOME/.local/share/Steam/" ]]; then
+        echo "$HOME/.local/share/Steam/"
+        return
+    fi
+    if [[ -d "$HOME/.steam/steam/" ]]; then
+        echo "$HOME/.steam/steam/"
+        return
+    fi
+    echo "ERROR: Could not find Steam installation path." >&2
+    exit 1
+}
 # STEAM_PATH="$HOME/.local/share/Steam/"
 STEAM_PATH=$(find_steam)
 GOTHIC2_PATH="${STEAM_PATH}steamapps/common/Gothic II/"
@@ -20,57 +39,49 @@ check_gothic_ini() {
         return 1  # does not exist
     fi
 }
-# Function to find where Steam is installed
-find_steam() {
-    # Flatpak
-    if [[ -d "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/" ]]; then
-        echo "Steam found at: $HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/"
-        return
-    fi
-
-    # Native package
-    if [[ -d "$HOME/.local/share/Steam/" ]]; then
-        echo "Steam found at: $HOME/.local/share/Steam/"
-        return
-    fi
-    if [[ -d "$HOME/.steam/steam/"]]; then
-        echo "Steam found at: $HOME/.steam/steam/"
-        return
-    fi
-
-    echo "ERROR: Could not find Steam installation path." >&2
-    exit 1
-}
 # Welcome message
-echo -e "Welcome to the Gothic 2 Steam Deck script.\n"
-echo -e "Before running this script, make sure your Gothic 2 beta is set to 'workshop' in the Steam properties, as well as that you have all the desired mods subscribed in the Steam Workshop."
-echo "This script will uninstall Gothic 2 and remove anything from previous installations to ensure a clean install. Are you sure you want to continue? (y/n)"
+echo -e "\nWelcome to the Gothic 2 Steam Deck script.\n"
+echo -e "Before running this script, make sure your Gothic 2 beta is set to 'workshop' in the Steam properties, as well as that you have all the desired modifications subscribed in the Steam Workshop."
+echo "This script will modify your Gothic 2 installation, and optionally reinstall the game to ensure a clean installation. Are you sure you want to continue? (y/n)"
 # Confirmation prompt
-read -r answer
-if [[ $answer != "y" ]]; then
+read -r initial_answer
+if [[ $initial_answer != "y" ]]; then
     echo -e "\nExiting script."
     exit 0
 fi
-# Uninstall Gothic 2
-echo -e "\nUninstalling Gothic 2..."
-steam steam://uninstall/$APP_ID
-read -p "Press Enter once Gothic 2 has been uninstalled..."
-# Remove files from previous installations
-echo -e "\nRemoving files from previous Gothic 2 installations..."
-rm -rf "$GOTHIC2_PATH"
-rm -rf "$PREFIX_PATH"
-while [[ -d "$GOTHIC2_PATH" || -d "$PREFIX_PATH" ]]; do
-    sleep 2
+# Steam path message
+echo -e "\nSteam found at: $STEAM_PATH\n"
+# Clean and reinstall Gothic 2?
+echo "Do you wish to uninstall Gothic 2 along with all other files from previous installations, e.g. save files, configuration files? (y/n)"
+while true; do
+    read -r uninstall_answer
+    if [[ $uninstall_answer == "y" || $uninstall_answer == "n" ]]; then
+        break
+    else
+        echo "Invalid input. Please enter 'y' or 'n'."
+    fi
 done
-# Install Gothic 2
-echo -e "\nInstalling Gothic 2..."
-steam steam://install/$APP_ID
-read -p "Press Enter once Gothic 2 has been installed..."
-# Launch Gothic 2 for the first time
-echo -e "\nLaunch Gothic 2 for the first time to generate the necessary configuration files."
-echo "The script will open the Launcher. Press 'Play' and close the game after it reaches the main menu."
-steam steam://rungameid/39510
-read -p "Press Enter once Gothic 2 has been closed..."
+if [[ $uninstall_answer != "n" ]]; then
+    echo -e "\nUninstalling Gothic 2..."
+    steam steam://uninstall/$APP_ID
+    read -p "Press Enter once Gothic 2 has been uninstalled..."
+    # Remove files from previous installations
+    echo -e "\nRemoving files from previous Gothic 2 installations..."
+    rm -rf "$GOTHIC2_PATH"
+    rm -rf "$PREFIX_PATH"
+    while [[ -d "$GOTHIC2_PATH" || -d "$PREFIX_PATH" ]]; do
+        sleep 2
+    done
+    # Install Gothic 2
+    echo -e "\nInstalling Gothic 2..."
+    steam steam://install/$APP_ID
+    read -p "Press Enter once Gothic 2 has been installed..."
+    # Launch Gothic 2 for the first time
+    echo -e "\nLaunch Gothic 2 for the first time to generate the necessary configuration files."
+    echo "The script will open the Launcher. Press 'Play' and close the game after it reaches the main menu."
+    steam steam://rungameid/39510
+    read -p "Press Enter once Gothic 2 has been closed..."
+fi
 # Install Protontricks
 echo "Installing Protontricks..."
 flatpak install -y com.github.Matoking.protontricks
@@ -84,11 +95,14 @@ if [[ -f "$USER_REG_PATH" ]]; then
     sed -i 's/"\*dsound"="native"/"ddraw"="native,builtin"/' "$USER_REG_PATH"
 else
     echo "ERROR: user.reg file not found at $USER_REG_PATH." >&2
+    sleep 2
 fi
 if grep -q '"ddraw"="native,builtin"' "$USER_REG_PATH"; then
-    echo "user.reg modified successfully.\n"
+    echo -e "\nuser.reg modified successfully.\n"
+    sleep 2
 else
     echo "ERROR: Failed to modify user.reg." >&2
+    sleep 2
 fi
 # Adjust interface scale
 echo "Adjusting interface scale..."
@@ -96,11 +110,14 @@ if [[ -f "$SYSTEMPACK_INI_PATH" ]]; then
     sed -i '/^Scale=/c\Scale=1.4' "$SYSTEMPACK_INI_PATH"
 else
     echo "ERROR: SystemPack.ini file not found at $SYSTEMPACK_INI_PATH." >&2
+    sleep 2
 fi
 if grep -q 'Scale=1.4' "$SYSTEMPACK_INI_PATH"; then
     echo "SystemPack.ini - Scale modified successfully."
+    sleep 2
 else
     echo "ERROR: Failed to modify SystemPack.ini." >&2
+    sleep 2
 fi
 # Fix L'Hiver interface scale
 echo -e "\nAdjusting L'Hiver interface scale..."
@@ -112,15 +129,19 @@ if [[ -d "$LHIVER_DIR" ]]; then
             sed -i '/INTERFACE.Scale=0/d' "$LHIVER_INI_PATH"
         else
             echo "ERROR: File $FILE not found at $LHIVER_INI_PATH." >&2
+            sleep 2
         fi
         if ! grep -q 'INTERFACE.Scale=0' "$LHIVER_INI_PATH"; then
             echo "$FILE - Scale modified successfully."
+            sleep 2
         else
             echo "ERROR: Failed to modify $FILE." >&2
+            sleep 2
         fi
     done
 else
     echo "L'Hiver not installed. Skipping."
+    sleep 2
 fi
 # Adjust XP Bar
 echo -e "\nAdjusting XP Bar..."
@@ -131,14 +152,18 @@ if [[ -d "$XP_BAR_DIR" ]]; then
         sed -i '/^possibleFontsMultiplierIdx=/c\possibleFontsMultiplierIdx=5' "$GOTHIC_INI_PATH"
     else
         echo "ERROR: Gothic.ini file not found at $GOTHIC2_PATH/system." >&2
+        sleep 2
     fi
     if grep -q 'needTextInCenter=0' "$GOTHIC_INI_PATH" && grep -q 'possibleFontsMultiplierIdx=5' "$GOTHIC_INI_PATH"; then
         echo "Gothic.ini - XP Bar modified successfully."
+        sleep 2
     else
         echo "ERROR: Failed to modify Gothic.ini." >&2
+        sleep 2
     fi
 else
     echo "XP Bar not installed. Skipping."
+    sleep 2
 fi
 # Adjust Union Advanced Inventory
 echo -e "\nAdjusting Union Advanced Inventory..."
@@ -151,17 +176,21 @@ if [[ -d "$ADV_INVENTORY_PATH" ]]; then
             sed -i '/^customTransparencyItemsIdx=/c\customTransparencyItemsIdx=4' "$GOTHIC_INI_PATH"
         else
             echo "ERROR: Gothic.ini file not found at $GOTHIC2_PATH/system." >&2
+            sleep 2
         fi
         if grep -q "invAdvCntRows=4" "$GOTHIC_INI_PATH" && \
            grep -q "invAdvCntCol=6" "$GOTHIC_INI_PATH" && \
            grep -q "invSizeCell=600" "$GOTHIC_INI_PATH" && \
            grep -q "customTransparencyItemsIdx=4" "$GOTHIC_INI_PATH"; then
             echo "Gothic.ini - Union Advanced Inventory modified successfully."
+            sleep 2
         else
             echo "ERROR: Failed to modify Gothic.ini." >&2
+            sleep 2
         fi
 else
     echo "Union Advanced Inventory not installed. Skipping."
+    sleep 2
 fi
 # Finished
 echo -e "\nAll done. Gothic 2 is now set up and configured for the Steam Deck."
