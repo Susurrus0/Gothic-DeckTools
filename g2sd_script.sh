@@ -17,11 +17,20 @@ find_steam() {
         echo "$HOME/.steam/steam/"
         return
     fi
-    echo "ERROR: Could not find Steam installation path." >&2
+    echo "ERROR: Could not find Steam." >&2
     exit 1
+}
+# Function to set the Steam command
+set_steam_command() {
+    if [[ -d "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/" ]]; then
+        return "flatpak run com.valvesoftware.Steam"
+    else
+        return "steam"
+    fi
 }
 # STEAM_PATH="$HOME/.local/share/Steam/"
 STEAM_PATH=$(find_steam)
+STEAM_COMMAND=$(set_steam_command)
 GOTHIC2_PATH="${STEAM_PATH}steamapps/common/Gothic II/"
 GOTHIC_INI_PATH="${GOTHIC2_PATH}system/Gothic.ini"
 SYSTEMPACK_INI_PATH="${GOTHIC2_PATH}system/SystemPack.ini"
