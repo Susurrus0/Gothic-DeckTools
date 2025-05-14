@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -euo pipefail
 
 mkdir -p ~/.local/share/applications/
 
-mkdir -p ~/.susurrus0
-cd ~/.susurrus0
+mkdir -p ~/.sustools
+cd ~/.sustools
 wget -O file.zip # link to release
 unzip -o file.zip
 rm file.zip
