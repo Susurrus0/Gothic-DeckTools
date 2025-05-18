@@ -23,9 +23,11 @@ find_steam() {
 # Function to set the Steam command
 set_steam_command() {
     if [[ -d "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/" ]]; then
-        return "flatpak run com.valvesoftware.Steam"
+        echo "flatpak run com.valvesoftware.Steam"
+        return
     else
-        return "steam"
+        echo "steam"
+        return
     fi
 }
 # STEAM_PATH="$HOME/.local/share/Steam/"
