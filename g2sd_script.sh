@@ -33,6 +33,7 @@ set_steam_command() {
 # STEAM_PATH="$HOME/.local/share/Steam/"
 STEAM_PATH=$(find_steam)
 STEAM_COMMAND=$(set_steam_command)
+COMPATTOOLS_PATH="${STEAM_PATH}compatibilitytools.d/"
 GOTHIC2_PATH="${STEAM_PATH}steamapps/common/Gothic II/"
 GOTHIC_INI_PATH="${GOTHIC2_PATH}system/Gothic.ini"
 SYSTEMPACK_INI_PATH="${GOTHIC2_PATH}system/SystemPack.ini"
