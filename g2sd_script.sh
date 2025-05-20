@@ -94,28 +94,22 @@ if [[ $uninstall_answer != "n" ]]; then
     steam steam://rungameid/39510
     read -p "Press Enter once Gothic 2 has been closed..."
 fi
-# Install Protontricks
-echo "Installing Protontricks..."
-flatpak install -y com.github.Matoking.protontricks
-while ! flatpak list | grep -q "com.github.Matoking.protontricks"; do
-    sleep 2
-done
-# Fix Gothic 2 background music bug
-flatpak run com.github.Matoking.protontricks 39510 directmusic
-USER_REG_PATH="${PREFIX_PATH}user.reg"
-if [[ -f "$USER_REG_PATH" ]]; then
-    sed -i 's/"\*dsound"="native"/"ddraw"="native,builtin"/' "$USER_REG_PATH"
-else
-    echo "ERROR: user.reg file not found at $USER_REG_PATH." >&2
-    sleep 2
-fi
-if grep -q '"ddraw"="native,builtin"' "$USER_REG_PATH"; then
-    echo -e "\nuser.reg modified successfully.\n"
-    sleep 2
-else
-    echo "ERROR: Failed to modify user.reg." >&2
-    sleep 2
-fi
+# Install Protonup
+echo -e "\nInstalling Protonup..."
+git clone https://github.com/AUNaseef/protonup && cd protonup
+python3 setup.py install --user
+cd ..
+sleep 2
+rm -rf protonup
+# Install GE-Proton
+echo -e "\nInstalling GE-Proton9-27..."
+protonup -d "$COMPATTOOLS_PATH"
+protonup -t GE-Proton9-27 -y
+sleep 2
+echo -e "\nRestarting Steam..."
+killall -e $STEAM_COMMAND
+sleep 10
+$STEAM_COMMAND
 # Adjust interface scale
 echo "Adjusting interface scale..."
 if [[ -f "$SYSTEMPACK_INI_PATH" ]]; then
