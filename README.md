@@ -5,7 +5,7 @@ Tools for easily configuring and tweaking Gothic 2 on the Steam Deck and Linux.
 
 To install Gothic2-DeckTools, run:
 
-`curl https://raw.githubusercontent.com/Susurrus0/Gothic2-SusTools/refs/heads/main/install.sh | bash -s --`
+`curl https://raw.githubusercontent.com/Susurrus0/Gothic2-DeckTools/refs/heads/main/install.sh | bash -s --`
 
 ## Usage
 
