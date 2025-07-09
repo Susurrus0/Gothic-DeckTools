@@ -1,11 +1,11 @@
-# Gothic2-SusTools
+# Gothic2-DeckTools
 Tools for easily configuring and tweaking Gothic 2 on the Steam Deck and Linux.
 
 ## Installation
 
-To install Gothic2-SusTools, run:
+To install Gothic2-DeckTools, run:
 
-`curl https://raw.githubusercontent.com/Susurrus0/Gothic2-SusTools/refs/heads/main/install.sh | bash -s --`
+`curl https://raw.githubusercontent.com/Susurrus0/Gothic2-DeckTools/refs/heads/main/install.sh | bash -s --`
 
 ## Usage
 
@@ -13,6 +13,6 @@ To install Gothic2-SusTools, run:
 
 ## Uninstallation
 
-To uninstall Gothic2-SusTools, run:
+To uninstall Gothic2-DeckTools, run:
 
-`rm -rf ~/.sustools`
+`rm -rf ~/.susurrus0`
